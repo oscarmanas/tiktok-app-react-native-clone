@@ -10,6 +10,11 @@
       "StackName": "amplify-tiktokreactnativeclo-dev-122504",
       "StackId": "arn:aws:cloudformation:eu-west-1:155231157411:stack/amplify-tiktokreactnativeclo-dev-122504/cc788500-67a4-11eb-9886-02620ee4016b",
       "AmplifyAppId": "d6q7c1aw11q07"
+    },
+    "categories": {
+      "auth": {
+        "tiktokreactnativeclob0d27222": {}
+      }
     }
   }
 }
