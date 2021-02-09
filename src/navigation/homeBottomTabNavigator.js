@@ -1,6 +1,8 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Home from '../screens/Home';
+import Camera from '../screens/Camera';
+
 import Entypo from 'react-native-vector-icons/Entypo';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -37,7 +39,7 @@ const HomeBottomTabNavigator = () => {
                 />
             <Tab.Screen 
                 name={"Upload"}
-                component={Home}
+                component={Camera}
                 options={{
                     tabBarIcon: ({color}) => (
                         <MaterialCommunityIcons name={'cloud-upload'} size={24} color={color}/>
