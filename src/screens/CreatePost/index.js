@@ -8,9 +8,10 @@ import {useRoute, useNavigation} from '@react-navigation/native';
 
 import {createPost} from '../../graphql/mutations';
 
-const CreatePost = (props) => {
+const CreatePost = () => {
     const [description, setdescription] = useState("");
     const [videoKey, setvideoKey] = useState(null);
+    
     const route = useRoute();
     const navigation = useNavigation();
     
@@ -25,8 +26,6 @@ const CreatePost = (props) => {
                     const s3Response = await Storage.put(filename, blob)
 
                     setvideoKey(s3Response.key);
-
-                    console.log(s3Response);
                 } catch (e) {
                     console.error(e);
                 }
@@ -38,19 +37,18 @@ const CreatePost = (props) => {
 
         // create post in DB (API)
         const onPublish = async () => {
-            if(!videoKey) {
+            if (!videoKey) {
                 console.warn('Video is not yet uploaded')
                 return;
             }
 
             try{
-
                 const userInfo = await Auth.currentAuthenticatedUser();
 
                 const newPost = {
                     videoUri: videoKey,
                     description: description,
-                    userID: userInfo.attribute.sub,
+                    userID: userInfo.attributes.sub,
                     songID: "87007777-5027-480f-8f53-940b28e924a4"
                 }
 
@@ -58,7 +56,7 @@ const CreatePost = (props) => {
                     graphqlOperation(
                         createPost,
                         {input: newPost}
-                    )
+                    ),
                 );
                 navigation.navigate("Home", {screen: "Home"});
             }catch (e) {
@@ -66,7 +64,7 @@ const CreatePost = (props) => {
             }
     }
         return (
-            <View>
+            <View style={styles.container}>
                 <TextInput
                 value={description}
                 onChangeText={setdescription}

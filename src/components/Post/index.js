@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableWithoutFeedback, Image, TouchableOpacity } from 'react-native';
 import {Storage} from 'aws-amplify';
 
@@ -9,13 +9,12 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fontisto from 'react-native-vector-icons/Fontisto';
-import { useEffect } from 'react';
 
 
 const Post = (props) => {
     const [post, setPost] = useState(props.post);
     const [isliked, setIsLiked] = useState(false);
-    const [videoUri, setvideoUri] = useState('');
+    const [videoUri, setVideoUri] = useState('');
 
     const [paused, setPaused] = useState(false);
 
@@ -34,10 +33,10 @@ const Post = (props) => {
 
     const getVideoUri = async () =>{
         if (post.videoUri.startsWith('http')){
-            setvideoUri(post.videoUri);
+            setVideoUri(post.videoUri);
             return;
         }
-        setvideoUri(await Storage.get(post.videoUri));
+        setVideoUri(await Storage.get(post.videoUri));
     };
 
     useEffect(() =>{
@@ -46,21 +45,22 @@ const Post = (props) => {
 
     return (
         <View style={styles.container}>
-            <TouchableWithoutFeedback onPress={onPlayPausePress} style={styles.videoPlayButton}>
+            <TouchableWithoutFeedback onPress={onPlayPausePress}>
                 <View>
                     <Video
-                    source={{uri: videoUri()}}
+                    source={{uri: videoUri}}
                     style={styles.video}
                     onError={(e)=>console.log(e)}
                     resizeMode={'cover'}
                     loop={true}
                     paused={paused}
                 />
-            
-
                     <View style={styles.uiContainer}>
                         <View style={styles.rightContainer}>
-                            <Image style={styles.profilePicture} source={{uri: post.user.imageUri}} />
+                            <Image 
+                            style={styles.profilePicture} 
+                            source={{uri: post.user.imageUri}} 
+                            />
 
                         <TouchableOpacity style={styles.iconContainer} onPress={onLikePress}>
                             <AntDesign name={"heart"} size={40} color={isliked ? 'red' : 'white'} />        
@@ -70,15 +70,12 @@ const Post = (props) => {
                         <View style={styles.iconContainer}>
                             <FontAwesome name={"commenting"} size={40} color={'white'} />        
                             <Text style={styles.statsLabel}>{post.comments}</Text>
-                        
                         </View>
                         <View style={styles.iconContainer}>
                             <Fontisto name={"share-a"} size={35} color={'white'} />        
                             <Text style={styles.statsLabel}>{post.shares}</Text>
-                        
                         </View>
-                    
-                </View>
+                        </View>
                 
                 <View style={styles.bottomContainer}>
                     <View>
@@ -90,9 +87,11 @@ const Post = (props) => {
                     <Text style={styles.songName}>{post.song.name}</Text>
                     </View>
                     </View>
-                    <Image style={styles.songImage} source={{uri: post.song.imageUri}} />
+                    <Image 
+                    style={styles.songImage} 
+                    source={{uri: post.song.imageUri}} 
+                    />
                 </View>
-                
             </View>
             </View>
             </TouchableWithoutFeedback>

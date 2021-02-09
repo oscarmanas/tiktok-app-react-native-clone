@@ -1,6 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import React, {useState} from 'react';
-import { useRef } from 'react';
+import React, {useState, useRef} from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import {RNCamera} from 'react-native-camera';
 import styles from './styles.js';
