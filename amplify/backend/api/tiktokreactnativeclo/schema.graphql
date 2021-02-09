@@ -22,5 +22,5 @@ type Post @model @key(name: "byUser", fields: ["userID"]) {
 type Song @model {
   id: ID!
   name: String!
-  imageUri: String! 
+  imageUri: String
 }

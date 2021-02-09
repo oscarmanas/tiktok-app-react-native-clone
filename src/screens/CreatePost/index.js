@@ -1,37 +1,86 @@
-import React, {useState} from 'react';
-import { useRef } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import {RNCamera} from 'react-native-camera';
+import React, {useState, useEffect} from 'react';
+import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import styles from './styles.js';
+import { v4 as uuidv4 } from 'uuid';
 
-const Camera = () => {
-    const [isRecording, setIsRecording] = useState(false)
-    const camera = useRef();
+import {Storage, API, graphqlOperation, Auth} from 'aws-amplify';
+import {useRoute, useNavigation} from '@react-navigation/native';
 
-    const onRecord = async () => {
-        if (isRecording) {
-            camera.current.stopRecording();
-        } else {
-            const data = await camera.current.recordAsync();
-            console.log(data)
-        }
-    };
+import {createPost} from '../../graphql/mutations';
 
-    return (
-        <View style={styles.container}> 
-            <RNCamera
-            ref={camera}
-            onRecordingStart={() => setIsRecording (true)}
-            onRecordingEnd={() => setIsRecording(false)}
-            style={styles.preview} 
-            />
-            <TouchableOpacity 
-            onPress={onRecord} 
-            style={isRecording? styles.buttonStop : styles.buttonRecord}>
+const CreatePost = (props) => {
+    const [description, setdescription] = useState("");
+    const [videoKey, setvideoKey] = useState(null);
+    const route = useRoute();
+    const navigation = useNavigation();
+    
+        // upload video to cloud
+            const uploadToStorage = async (imagePath) => {
+                try{
+                    const response = await fetch(imagePath);
 
-            </TouchableOpacity>
-        </View>
-    );
+                    const blob = await response.blob();
+
+                    const filename = `${uuidv4()}.mp4`;
+                    const s3Response = await Storage.put(filename, blob)
+
+                    setvideoKey(s3Response.key);
+
+                    console.log(s3Response);
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+
+            useEffect(() => {
+                uploadToStorage(route.params.videoUri)
+            }, [])
+
+        // create post in DB (API)
+        const onPublish = async () => {
+            if(!videoKey) {
+                console.warn('Video is not yet uploaded')
+                return;
+            }
+
+            try{
+
+                const userInfo = await Auth.currentAuthenticatedUser();
+
+                const newPost = {
+                    videoUri: videoKey,
+                    description: description,
+                    userID: userInfo.attribute.sub,
+                    songID: "87007777-5027-480f-8f53-940b28e924a4"
+                }
+
+                const response = await API.graphql(
+                    graphqlOperation(
+                        createPost,
+                        {input: newPost}
+                    )
+                );
+                navigation.navigate("Home", {screen: "Home"});
+            }catch (e) {
+                console.error(e);
+            }
+    }
+        return (
+            <View>
+                <TextInput
+                value={description}
+                onChangeText={setdescription}
+                numberOfLines={5}
+                placeholder={"Desciption"}
+                style={styles.TextInput}
+                />
+                <TouchableOpacity onPress={onPublish}>
+                    <View style={styles.button}>
+                        <Text style={styles.buttonText}>Publish</Text>
+                    </View>  
+                </TouchableOpacity>
+            </View>
+        );
 };
 
-export default Camera
+export default CreatePost;

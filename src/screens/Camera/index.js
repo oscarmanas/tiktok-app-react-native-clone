@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React, {useState} from 'react';
 import { useRef } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
@@ -8,12 +9,14 @@ const Camera = () => {
     const [isRecording, setIsRecording] = useState(false)
     const camera = useRef();
 
+    const navigation = useNavigation();
+
     const onRecord = async () => {
         if (isRecording) {
             camera.current.stopRecording();
         } else {
             const data = await camera.current.recordAsync();
-            console.log(data)
+            navigation.navigate("CreatePost", { videoUri: data.uri});
         }
     };
 
